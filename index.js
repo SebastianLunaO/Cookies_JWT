@@ -9,7 +9,7 @@ app.set('view engine','ejs')
 app.use(express.json())
 
 app.get('/',(req,res)=>{
-    res.render('protected.ejs',{name: 'me'})
+    res.render('index.ejs',{name: 'me'})
 })
 
 app.post('/login', async (req,res)=>{
@@ -25,6 +25,7 @@ app.post('/login', async (req,res)=>{
 })
 app.post('/register', async (req,res)=>{
     const {username,password} = req.body
+    console.log('dhweiufwiuv')
     try{
         const id = await UserRepository.create({username,password})
         res.send({id}) 
@@ -33,7 +34,10 @@ app.post('/register', async (req,res)=>{
     }
 })
 app.post('/logout', (req,res)=>{})
-app.post('/protected', (req,res)=>{})
+app.post('/protected', (req,res)=>{
+    res.render('protected', {username: 'yo merengues'})
+
+})
 
 
 
