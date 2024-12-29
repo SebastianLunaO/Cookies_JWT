@@ -1,5 +1,7 @@
 import express from 'express'
 import { UserRepository } from './user-repository.js';
+import jwt from 'jsonwebtoken'
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -17,7 +19,10 @@ app.post('/login', async (req,res)=>{
 
     try{
         const user = await UserRepository.login({username,password})
-        res.send({user}) 
+        const token = jwt.sing({id: user._id, username: user.username},SECRET_KEY_JWT,{
+            expiresIn:'1h'
+        })
+        res.send({ user, token}) 
     } catch(error) {
         res.status(401).send(error.message)
     }
