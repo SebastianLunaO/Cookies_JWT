@@ -1,0 +1,23 @@
+{
+  "name": "cookies_jwt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebastianLunaO/Cookies_JWT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SebastianLunaO/Cookies_JWT/issues"
+  },
+  "homepage": "https://github.com/SebastianLunaO/Cookies_JWT#readme",
+  "devDependencies": {
+    "express": "^4.21.2"
+  }
+}
