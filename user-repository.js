@@ -1,12 +1,9 @@
  import DBLocal from 'db-local'
  const {Schema} = new DBLocal({path: './db'})
  import bcrypt from 'bcrypt'
+ import mysql2 from 'mysql2/promise'
 
- const User = Schema('User',{
-    _id: {type: String, required: true},
-    username: {type: String, required: true},
-    password: {type: String, required: true}
- })
+ const password = process.env.PASSWORD_MYSQL
 
  export class UserRepository{
     static async create ({username, password}) {
