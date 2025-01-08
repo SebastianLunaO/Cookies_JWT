@@ -3,7 +3,17 @@
  import bcrypt from 'bcrypt'
  import mysql2 from 'mysql2/promise'
 
- const password = process.env.PASSWORD_MYSQL
+ const passwordSQL = process.env.PASSWORD_MYSQL
+
+ const optionsConnection = {
+	host: 'localhost',
+	port: 3306,
+	user: 'root',
+	password: passwordSQL,
+    database: 'passport_test'
+};
+
+const pool  = mysql2.createPool(optionsConnection).promise() 
 
  export class UserRepository{
     static async create ({username, password}) {
