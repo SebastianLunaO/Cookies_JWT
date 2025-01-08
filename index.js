@@ -36,7 +36,7 @@ app.post('/login', async (req,res)=>{
 
     try{
         const user = await UserRepository.login({username,password})
-        const token = jwt.sign({id: user._id, username: user.username},SECRET_KEY_JWT,{
+        const token = jwt.sign({id: user.id, username: user.username},SECRET_KEY_JWT,{
             expiresIn:'1h'
         })
         res
@@ -50,6 +50,9 @@ app.post('/login', async (req,res)=>{
     } catch(error) {
         res.status(401).send(error.message)
     }
+
+        
+    
 
 })
 app.post('/register', async (req,res)=>{

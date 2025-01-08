@@ -1,7 +1,7 @@
  import DBLocal from 'db-local'
  const {Schema} = new DBLocal({path: './db'})
  import bcrypt from 'bcrypt'
- import mysql2 from 'mysql2/promise'
+ import mysql from 'mysql2/promise'
 
  const passwordSQL = process.env.PASSWORD_MYSQL
 
@@ -9,43 +9,80 @@
 	host: 'localhost',
 	port: 3306,
 	user: 'root',
-	password: passwordSQL,
-    database: 'passport_test'
+	password: 'Mausebas22',
+    database: 'jwt'
 };
 
-const pool  = mysql2.createPool(optionsConnection).promise() 
+    
+const nombre =  mysql.createPool(optionsConnection)
+
+async function createUser(username,password) {
+    try {
+        const [result] = await nombre.query(
+            `INSERT INTO
+            users(username,password) 
+            VALUES (?,?)`, [username,password] 
+        );
+        const id = result.insertId
+        return id
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+async function findByUser(username) {
+    try {
+        const result = await nombre.query(
+            `SELECT * FROM
+            users
+            WHERE username = ?`, username
+        );
+        const rows = result[0]
+        return rows[0]
+    } catch (error) {
+        throw new Error(error)
+    }
+   
+    
+    
+}
 
  export class UserRepository{
     static async create ({username, password}) {
         Validation.username(username)
         Validation.password(password)
         
-        const user = User.findOne({username});
-        if (user) throw new Error ('username already exist');
-        
-        const id = crypto.randomUUID();
-        const hashedPassword = await bcrypt.hash(password,10);
-
-        User.create({
-            _id: id,
-            username,
-            password: hashedPassword
-        }).save()
-        return id
+        const user = await findByUser(username)
+        try {
+            if(!(user.length === 0)){
+                throw new Error ('username already taken')
+            } else{
+                const hashedPassword = await bcrypt.hash(password,10);
+                const resultId= await createUser(username,hashedPassword)
+                return resultId
+            }
+        } catch (error) {
+            console.error(error)
+        }
     }
+
     static async login ({username,password}){
         Validation.username(username)
         Validation.password(password)
-        
-        const user = User.findOne({username});
-        if (!user) throw new Error ('username does not exist');
-
+        try {
+            const user = await findByUser(username)
+        if ((user.length === 0)) throw new Error ('username does not exist');
         const isValid = await bcrypt.compare(password, user.password)
         if(!isValid) throw new Error('username or password invalid')
 
-            const {password: _, ...publicUser} = user
+        const {password: _, ...publicUser} = user
 
         return publicUser
+        } catch (error) {
+            console.error(`Failing validating user ${error}`)
+        }
+        
     }
  }
 
