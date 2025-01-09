@@ -12,7 +12,32 @@ const PORT = process.env.PORT ?? 3000
 app.set('view engine','ejs')
 app.use(express.json())
 app.use(cookieParser())
-app.use((req,res,next)=>{/*console.log('request New access Token using refresh token');*/ next()})
+app.use(async (req,res,next)=>{
+    const refreshtoken = req.cookies.refresh_token
+    let data = null
+    if(req.path == '/logout'){
+        return next()}
+    if (refreshtoken===undefined){}
+    else{
+        data = jwt.verify(refreshtoken,SECRET_KEY_JWT)   
+    }
+    if (!data){
+    }else{
+         try {
+             const stored_token = await TokenRepo.getToken(data)
+             if(stored_token.token===refreshtoken){
+                 const newAccessToken = jwt.sign({id: data.id,username: data.username},SECRET_KEY_JWT,{
+                    expiresIn:'10s'
+                })
+                req.cookies.access_token = newAccessToken
+             next()
+             }
+         } catch (error) {
+             console.log(error)
+         }  
+    }
+    next()
+})
 app.use((req,res,next)=>{
     const accessToken = req.cookies.access_token
     let data = null
@@ -45,7 +70,6 @@ app.post('/login', async (req,res)=>{
             expiresIn:'10s'
         })
         const tokenResult = await TokenRepo.destination(user,refreshToken)
-        console.log(tokenResult)
         res
         .cookie('access_token',accessToken,{
             httpOnly: true,
@@ -62,6 +86,7 @@ app.post('/login', async (req,res)=>{
         .send({ user, accessToken,refreshToken}) 
 
     } catch(error) {
+        console.log(error)
         res.status(401).send(error.message)
     }
 
@@ -81,6 +106,7 @@ app.post('/register', async (req,res)=>{
 app.post('/logout', (req,res)=>{
     res
     .clearCookie('access_token')
+    .clearCookie('refresh_token')
     .send({message: 'Logout successful'})
 })
 app.get('/protected', (req,res)=>{

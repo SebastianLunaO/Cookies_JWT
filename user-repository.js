@@ -46,7 +46,6 @@ async function findByUser(username) {
 }
 
 async function addToken(user,token) {
-    console.log(`user: ${user.id} and token: ${token}`)
     try {
         const [result] = await nombre.query(
             `INSERT 
@@ -60,15 +59,16 @@ async function addToken(user,token) {
 }
 
 async function updateToken(user,token) {
-    console.log(``)
     try {
         const result = await nombre.query(
             `UPDATE 
-            RToken 
+            RTokens 
             SET token = ?
             WHERE user_id = ?`,[token,user.id]
         )
-        return result
+        const updated = await getTokenByUser(user)
+        console.log(updated)
+        return updated
     } catch (error) {
         
     }
@@ -78,7 +78,7 @@ async function getTokenByToken(user,token) {
     try {
         const result = await nombre.query(
             `SELECT *
-            FROM RToken
+            FROM RTokens
             WHERE token = ?`,token
         )
         return result[0][0]
@@ -91,10 +91,10 @@ async function getTokenByUser(user) {
     try {
         const result = await nombre.query(
             `SELECT *
-            FROM RToken
+            FROM RTokens
             WHERE user_id = ?`,user.id
-        )
-        return result
+        )    
+        return result[0][0]
     } catch (error) {
         
     }
@@ -115,7 +115,7 @@ async function getTokenByUser(user) {
                 return resultId
             }
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
     }
 
@@ -157,12 +157,10 @@ async function getTokenByUser(user) {
         const result = await getTokenByUser(user)
         
         if(!(result === undefined)){
-            const resultado = await this.updatedTokenNewToken(user,token)
-            console.log(`updated`)
+            const resultado = await this.updatedToken(user,token)
             return resultado 
         } else{
             const resultado2 = await this.addNewToken(user,token)
-            console.log(`created`)
             return resultado2
         }
     } catch (error) {
@@ -190,8 +188,7 @@ async function getTokenByUser(user) {
 
     static async getToken(user,token){
         try {
-            const result = await getTokenByToken(user,token)
-            console.log(`inside get token ${result}`)
+            const result = await getTokenByUser(user,token)
             return result
         } catch (error) {
             console.log(error)
