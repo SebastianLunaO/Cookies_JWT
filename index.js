@@ -3,7 +3,7 @@ import { UserRepository } from './model/db/SQL/usersModel.js';
 import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser';
 import { SECRET_KEY_JWT } from './config.js';
-import {TokenRepo} from './user-repository.js'
+import {TokenRepo} from './model/db/SQL/tokensModel.js'
 import https from 'https'
 import fs from 'fs'
 import path from 'path';
