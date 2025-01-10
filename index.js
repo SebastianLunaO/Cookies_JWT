@@ -4,10 +4,21 @@ import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser';
 import { SECRET_KEY_JWT } from './config.js';
 import {TokenRepo} from './user-repository.js'
-
+import https from 'https'
+import fs from 'fs'
+import path from 'path';
 const app = express();
 
 const PORT = process.env.PORT ?? 3000
+
+const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).pathname)));
+console.log(__dirname)
+
+const sslServer = https.createServer({
+    key:fs.readFileSync(path.join(__dirname,'cert','key.pem')),
+    cert:fs.readFileSync(path.join(__dirname,'cert','cert.pem'))
+},app)
+
 
 app.set('view engine','ejs')
 app.use(express.json())
@@ -23,7 +34,7 @@ app.use(async (req,res,next)=>{
     }
     if (!data){
     }else{
-         try {
+         try { 
              const stored_token = await TokenRepo.getToken(data)
              if(stored_token.token===refreshtoken){
                  const newAccessToken = jwt.sign({id: data.id,username: data.username},SECRET_KEY_JWT,{
@@ -117,8 +128,5 @@ app.get('/protected', (req,res)=>{
 
 })
 
+sslServer.listen(PORT, ()=>{console.log(`Secure connnection in ${PORT}`)})
 
-
-app.listen(PORT, ()=>{
-    console.log(`Server running on port ${PORT}`)
-})
