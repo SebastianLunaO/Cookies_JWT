@@ -12,7 +12,6 @@ const app = express();
 const PORT = process.env.PORT ?? 3000
 
 const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).pathname)));
-console.log(__dirname)
 
 const sslServer = https.createServer({
     key:fs.readFileSync(path.join(__dirname,'cert','key.pem')),
@@ -84,13 +83,13 @@ app.post('/login', async (req,res)=>{
         res
         .cookie('access_token',accessToken,{
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'prodcution',
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 1000 * 60 * 10
         })
         res.cookie('refresh_token',refreshToken,{
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'prodcution',
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 1000 * 60 * 60 * 24 * 10 
         })

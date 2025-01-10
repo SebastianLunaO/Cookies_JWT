@@ -67,7 +67,6 @@ async function updateToken(user,token) {
             WHERE user_id = ?`,[token,user.id]
         )
         const updated = await getTokenByUser(user)
-        console.log(updated)
         return updated
     } catch (error) {
         
